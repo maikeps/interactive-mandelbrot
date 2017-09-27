@@ -8,8 +8,8 @@ from PIL import ImageTk
 
 N_MAX_ITERATIONS = 256
 N_THREADS = 4
-WIDTH = 128
-HEIGHT = 128
+WIDTH = 512
+HEIGHT = 512
 SCALE_FACTOR = 1
 X_CENTER = 0.3
 Y_CENTER = 0.7
@@ -21,22 +21,25 @@ def mandelbrot(start_row, start_col, n_rows, n_cols, x_center=0, y_center=0, sca
 	pixels_list = []
 	grey_shade = 0
 
+	half_width = float(WIDTH/2)
+	half_height = float(HEIGHT/2)
 	for i in range(start_col, start_col+n_cols):
 		for j in range(start_row, start_row+n_rows):
-			x = x_center + scale_factor * float(i - WIDTH/2)/WIDTH
-			y = y_center + scale_factor * float(j - HEIGHT/2)/HEIGHT
+			x = x_center + scale_factor * (i - half_width)/WIDTH
+			y = y_center + scale_factor * (j - half_height)/HEIGHT
 
 			it = 0
 			a, b = (0.0, 0.0)
 			r, g, b = 0, 0, 0
 
 			# optimization
-			p = sqrt((x-1/4)**2 + y**2)
-			if x < p - 2*p**2 + 1/4:
+			x_minus = x - 0.25
+			p = sqrt(x_minus*x_minus + y*y)
+			if x < p - 2*p*p + 0.25:
 				it = N_MAX_ITERATIONS
 			else:
-				while it < N_MAX_ITERATIONS and a**2 + b**2 < 4.0:
-					a, b = a**2 - b**2 + x, 2*a*b + y
+				while it < N_MAX_ITERATIONS and a*a + b*b < 4.0:
+					a, b = a*a - b*b + x, 2*a*b + y
 					it += 1
 
 			r, g, b = GRADIENT[it-1].rgb
